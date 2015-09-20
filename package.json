@@ -17,6 +17,7 @@
     "sequelize": "",
     "sequelize-cli": "",
     "serve-favicon": "~2.3.0",
-    "sqlite3": ""
+    "sqlite3": "",
+    "when": "^3.7.3"
   }
 }

@@ -9,14 +9,19 @@
         <link rel="stylesheet" href="../public/lib/bootstrap/bootstrap.css">
         <link rel="stylesheet" href="../public/stylesheets/main.css">
     </head>
-    <script>
-        {{ git }}
-    </script>
     <body>
         <div class="container">
             <div class="row">
                 <h1>Dev Shop</h1>
             </div>
+
+            <ul>
+                {{#each usuarios }}
+                    <li>
+                    {{ login }} - {{ followers }} - {{ qtd_star }}
+                    </li>
+                {{/each}}
+            </ul>
 
             <div class="row">
                 <h2>Add a developer</h2>
