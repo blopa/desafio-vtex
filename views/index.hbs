@@ -15,65 +15,72 @@
                 <h1>Dev Shop</h1>
             </div>
 
-            <ul>
-                {{#each usuarios }}
-                    <li>
-                    {{ login }} - {{ followers }} - {{ qtd_star }}
-                    </li>
-                {{/each}}
-            </ul>
-
             <div class="row">
-                <h2>Add a developer</h2>
-                <form class="form-inline" role="form">
-                    <div class="form-group">
-                        <input type="text" placeholder="GitHub Username" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" placeholder="Price" class="form-control">
-                    </div>
-                    <button type="submit" class="btn btn-success">Add</button>
-                </form>
-            </div>
-
-            <div class="cart row">
-                <h2>Cart</h2>
-                <table class="table">
+                <h2>Adicionar Desenvolvedor</h2>
+                <table class="table-shop" id="dev-shop-list">
                     <thead>
                     <tr>
-                        <th>Username</th>
-                        <th>Price</th>
+                        <th></th>
+                        <th>Usuário</th>
+                        <th>Preço p/ hora</th>
+                        <th>Horas</th>
                         <th></th>
                     </tr>
                     </thead>
                     <tbody>
-                        <tr class="product">
-                            <td>brenoc</td>
-                            <td>$224</td>
-                            <td><button class="btn btn-danger pull-right">Remove</button></td>
-                        </tr>
-                    <tr class="product">
-                        <td>firstdoit</td>
-                        <td>$416</td>
-                        <td><button class="btn btn-danger pull-right">Remove</button></td>
-                    </tr>
+                        {{#each usuarios }}
+                            <tr class="product" id="{{ login }}" class="row-{{ login }}">
+                                <td ><img src="{{ avatar_url }}" class="avatar-user avatar-{{ login }}"/></td>
+                                <td class="user-name user-{{ login }}">{{ login }}</td>
+                                <td class="preco-hora preco-hora-{{ login }} moeda">{{ preco }}</td>
+                                <td><input type="text" class="total-horas total-horas-{{ login }}"></td>
+                                <td><button class="btn btn-success pull-right" name="{{ login }}" onclick="addField(this);">Contratar</button></td>
+                            </tr>
+                        {{/each}}
                     </tbody>
                 </table>
             </div>
 
-            <div class="totalizer row">
-                <div class="col-sm-5">
-                    <div class="row">
-                        <table class="table">
-                            <tbody>
-                            <tr class="total">
-                                <td>Total</td>
-                                <td>$640</td>
-                            </tr>
-                            </tbody>
-                        </table>
+            <div class="cart row">
+                <h2>Carrinho</h2>
+                <table id="carrinho" class="table-cart">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Usuário</th>
+                        <th>Preço p/ hora</th>
+                        <th>Horas</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="container-total-carrinho">
+                <div class="totais-carrinho">
+                    <div class="total-carrinho">
+                        <h4>Total</h4>
+                        <p class="preco-total-cart moeda">0</p>
+                    </div>
+                    <div class="subtotal-carrinho">
+                        <h4>Subtotal</h4>
+                        <p class="preco-subtotal-cart moeda">0</p>
                     </div>
                 </div>
+                <div class="desconto">
+                    <h4>Desconto</h4>
+                    <input type="text" class="cupom">
+                    <button class="btn btn-warning pull-right crt-btn-desconto" onclick="addDesconto(this);">Inserir</button>
+                    <p class="mensagem-cupom"></p>
+                </div>
+            </div>
+            <div class="container-finalizar-pedido">
+                <br/>
+                <button class="btn btn-primary pull-right crt-btn-finalizar" onclick="finalizarPedido();">Finalizar Pedido</button>
             </div>
 
         </div> <!-- /container -->

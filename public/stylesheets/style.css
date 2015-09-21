@@ -6,3 +6,21 @@ body {
 a {
   color: #00B7FF;
 }
+
+.table-shop, .table-cart{width: 50%;}
+
+.avatar-user{width: 35px}
+
+.container-finalizar-pedido{width: 50%;}
+
+.crt-btn-finalizar{width: 100%;}
+
+.moeda:before { content:'R$ '; }
+
+.total-carrinho{float: right; width: 50%;}
+
+.totais-carrinho{float: right; width: 50%; padding-left: 10%;}
+
+.subtotal-carrinho{width: 50%;}
+
+.container-total-carrinho, .desconto{width: 50%}
