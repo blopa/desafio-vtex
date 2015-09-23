@@ -8,6 +8,10 @@
   "dependencies": {
     "body-parser": "~1.13.2",
     "cookie-parser": "~1.3.5",
+    "express-session": "",
+    "cookie-parser": "",
+    "body-parser": "",
+    "uid2": "",
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "github": "",

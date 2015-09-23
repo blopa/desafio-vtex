@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 var when = require('when');
+//var app = express();
 
 var request_options = {
   headers: {
@@ -10,11 +11,30 @@ var request_options = {
   }
 };
 
+var session;
+var org;
+
+function checkSession(argument){
+  var sess = argument;
+  if(sess.org){
+    return null;
+  }
+  else{
+    return sess.org;
+  }
+}
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-  var org = req.query.org || 'AmazingWorks';
-  console.log(req.query, org);
+  session = req.session;
+  var sessionChecked = checkSession(session);
+  if(sessionChecked){
+    org = sessionChecked;
+  }
+  else{
+    org = req.query.org || 'AmazingWorks';
+    session.org = org;
+  }
+  //console.log(req.query, org);
   // todos os membros de uma organização
   request.get(
       'https://api.github.com/orgs/' + org + '/members',
@@ -55,6 +75,8 @@ router.get('/', function(req, res, next) {
                                 usuario.preco += contribuicao.contributions;
                               }
                             });
+                            //res.cookie('nome', 'valor', { maxAge: 900000, httpOnly: true });
+                            //console.log(req.cookie);
                           }
                           sinalizador_repositorios.resolve();
                         });
@@ -75,9 +97,8 @@ router.get('/', function(req, res, next) {
           res.render('error', { title: 'VTEX', message: 'Empresa inexistente ou repositórios vazios'});
         }
     when.all(promises_usuarios).then(function () {
-
+      console.log(session);
       res.render('index', { title: 'VTEX', usuarios:usuarios });
-
     });
 
   });
