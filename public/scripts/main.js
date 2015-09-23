@@ -1,3 +1,5 @@
+
+
 function addField (argument) {
     var user = argument.name; // nome do usuario do github
 
@@ -22,6 +24,12 @@ function addField (argument) {
         var currentIndex = myTable.rows.length;
         var currentRow = myTable.insertRow(-1);
 
+        if(document.cookie.indexOf("qntCarrinho") < 0) {
+            createCookie('qntCarrinho', 0, 1);
+        }
+        var qntCarrinho = parseInt(readCookie('qntCarrinho')) + 1;
+        createCookie('qntCarrinho', qntCarrinho, 1);
+
         // adicionando nova row pra tabela do carrinho com todos elementos necessarios
         var rowUseravatar = document.createElement("img");
         rowUseravatar.setAttribute("class", "avatar-user crt-avatar-user-" + user);
@@ -38,10 +46,14 @@ function addField (argument) {
         var rowTotalhoras = document.createElement("p");
         rowTotalhoras.setAttribute("class", "total-horas crt-total-horas-" + user);
         rowTotalhoras.innerHTML = totalHoras[0].value;
+        //createCookie('totalHoras-' + user, totalHoras[0].value, 1);
+        createCookie('cartTotalhoras-' + user, totalHoras[0].value, 1);
 
         var rowprecoTotaluser = document.createElement("p");
         rowprecoTotaluser.setAttribute("class", "moeda preco-total-user crt-preco-total-" + user);
         rowprecoTotaluser.innerHTML = precoTotaluser;
+        //createCookie('precoTotaluser-' + user, precoTotaluser, 1);
+        createCookie('cartPrecototaluser-' + user, precoTotaluser, 1);
 
         var rowRemoveuser = document.createElement("input");
         rowRemoveuser.setAttribute("name", user);
@@ -67,30 +79,43 @@ function addField (argument) {
 
         currentCell = currentRow.insertCell(-1);
         currentCell.appendChild(rowRemoveuser);
-
-        // atualizando subtotal do pedido
-        var precoTotalcart = document.getElementsByClassName('preco-subtotal-cart');
-        precoTotalcart[0].innerHTML = parseInt(precoTotalcart[0].innerHTML) + precoTotaluser;
     }
     else{ // caso dev ja esteja no carrinho, apenas adiciona as horas
         var atualizaTotalhoras = document.getElementsByClassName('crt-total-horas-' + user);
-        atualizaTotalhoras[0].innerHTML = parseInt(atualizaTotalhoras[0].innerHTML) + parseInt(totalHoras[0].value);
-
-        var precoTotalcart = document.getElementsByClassName('preco-subtotal-cart');
-        precoTotalcart[0].innerHTML = parseInt(precoTotalcart[0].innerHTML) + precoTotaluser;
+        //var totalHorascookie = readCookie('totalHoras-' + user);
+        var cartTotalhorascookie = readCookie('cartTotalhoras-' + user);
+        var atualizaDadostotalhoras = parseInt(totalHoras[0].value) + parseInt(cartTotalhorascookie);
+        atualizaTotalhoras[0].innerHTML = atualizaDadostotalhoras;
+        createCookie('cartTotalhoras-' + user, atualizaDadostotalhoras, 1);
 
         var atualizaPrecototaluser = document.getElementsByClassName('crt-preco-total-' + user);
-        atualizaPrecototaluser[0].innerHTML = parseInt(atualizaPrecototaluser[0].innerHTML) + precoTotaluser;
+        var atualizaPrecototalusercookies = readCookie('cartPrecototaluser-' + user);
+        var atualizaDadosprecototal = parseInt(atualizaPrecototalusercookies) + precoTotaluser;
+        atualizaPrecototaluser[0].innerHTML = atualizaDadosprecototal;
+        createCookie('cartPrecototaluser-' + user, atualizaDadosprecototal, 1);
     }
+    // atualizando subtotal do pedido
+    var tempSubtotal = document.getElementsByClassName('preco-subtotal-cart');
+    var cartAtualizado = parseInt(tempSubtotal[0].innerHTML) + precoTotaluser;
+    tempSubtotal[0].innerHTML = cartAtualizado;
+    createCookie('precoSubtotalcart', cartAtualizado, 1);
     updateTotal("update"); // atualiza total do pedido
 }
 
 function removeFromcart (argument) {
     var user = argument.name;
 
-    var precoTotalcart = document.getElementsByClassName('preco-subtotal-cart');
-    var removePrecototaluser = document.getElementsByClassName('crt-preco-total-' + user);
-    precoTotalcart[0].innerHTML = parseInt(precoTotalcart[0].innerHTML) - parseInt(removePrecototaluser[0].innerHTML);
+    var precoSubtotalcart = document.getElementsByClassName('preco-subtotal-cart');
+    var precoSubtotalcartcookie = readCookie('precoSubtotalcart');
+    //var removePrecototaluser = document.getElementsByClassName('crt-preco-total-' + user);
+    var removePrecototaluser = readCookie('cartPrecototaluser-' + user);
+    var atualizaPrecosubtotal = parseInt(precoSubtotalcartcookie) - parseInt(removePrecototaluser);
+    precoSubtotalcart[0].innerHTML = atualizaPrecosubtotal;
+    createCookie('precoSubtotalcart', atualizaPrecosubtotal, 1);
+    createCookie('cartPrecototaluser-' + user, 0, 1);
+    var qntCarrinho = parseInt(readCookie('qntCarrinho')) - 1;
+    createCookie('qntCarrinho', qntCarrinho, 1);
+    eraseCookie('cartTotalhoras-' + user);
 
     // remove dev do carrinho
     var row = argument.parentNode.parentNode;
@@ -129,19 +154,52 @@ function updateTotal(argument){ // atualiza total usando acoes
 
     var acao = argument;
     var precoTotalcart = document.getElementsByClassName('preco-total-cart');
-    var precoSubtotalcart = document.getElementsByClassName('preco-subtotal-cart');
+    var precoSubtotalcart = readCookie('precoSubtotalcart');
+
     var mensagemCupom = document.getElementsByClassName('mensagem-cupom');
 
     if(acao == "addCupom"){
-        var valorCupom = parseInt(precoSubtotalcart[0].innerHTML)* 0.25;
-        precoTotalcart[0].innerHTML = parseInt(precoSubtotalcart[0].innerHTML) - valorCupom;
+        var valorCupom = parseInt(precoSubtotalcart)* 0.25;
+        createCookie('valorCupom', valorCupom, 1);
+        precoTotalcart[0].innerHTML = parseInt(precoSubtotalcart) - valorCupom;
         mensagemCupom[0].innerHTML = "Desconto de R$ " + valorCupom;
     }
     if(acao == "removeCupom"){
-        precoTotalcart[0].innerHTML = precoSubtotalcart[0].innerHTML;
+        precoTotalcart[0].innerHTML = precoSubtotalcart;
         mensagemCupom[0].innerHTML = "";
     }
     if(acao == "update") {
-        precoTotalcart[0].innerHTML = precoSubtotalcart[0].innerHTML;
+        precoTotalcart[0].innerHTML = precoSubtotalcart;
+        createCookie('precoTotalcart', precoSubtotalcart, 1);
     }
+    console.log(document.cookie);
+}
+
+// cookies
+
+function createCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        expires = "; expires="+date.toGMTString();
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var cookie = document.cookie.split(';');
+    for(var i = 0; i < cookie.length; i++) {
+        var c = cookie[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0){
+            return c.substring(nameEQ.length,c.length);
+        }
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name, "", -1);
 }
