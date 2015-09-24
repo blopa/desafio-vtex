@@ -14,15 +14,17 @@ function atualizaDadospg(){
         });
     }
     if(valorCupom){
-        var campoCupom = document.getElementsByClassName('cupom');
-        campoCupom[0].value = "SHIPIT";
-        addDesconto();
+        atualizaCupom();
     }
 }
 
 function addTocart(button){
     var user = button.dataset.user;
     addField(user);
+    if(localStorage.getItem('valorCupom')){
+        removeDesconto();
+        atualizaCupom();
+    }
 }
 
 function updateUserscarrinho(user){
@@ -159,7 +161,7 @@ function addField (argument, pagereload) {
     // atualizando subtotal do pedido
     var tempSubtotal = document.getElementsByClassName('preco-subtotal-cart');
     var cartAtualizado;
-    if(localStorage.getItem('precoSubtotalcart')){ // se ainda nao houve subtotal setado, set o subtotal a ser igual o total adicionado
+    if(localStorage.getItem('precoSubtotalcart') && !pagereload){ // se ainda nao houve subtotal setado, set o subtotal a ser igual o total adicionado
         cartAtualizado = parseInt(localStorage.getItem('precoSubtotalcart')) + precoTotaluser;
     }
     else{
@@ -196,6 +198,17 @@ function removeFromcart (argument) {
     var row = argument.parentNode.parentNode;
     row.parentNode.removeChild(row);
     updateTotal("update");
+    if(localStorage.getItem('valorCupom')){
+        removeDesconto();
+        atualizaCupom();
+    }
+}
+
+
+function atualizaCupom(){
+    var campoCupom = document.getElementsByClassName('cupom');
+    campoCupom[0].value = "SHIPIT";
+    addDesconto();
 }
 
 function addDesconto (argument){ // adiciona desconto no total do pedido
