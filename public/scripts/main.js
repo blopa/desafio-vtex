@@ -18,6 +18,10 @@ function atualizaDadospg(){
     }
 }
 
+function finalizarPedido(){
+
+}
+
 function addTocart(button){
     var user = button.dataset.user;
     addField(user);
@@ -242,6 +246,7 @@ function removeDesconto (argument){ // remove desconto do total do pedido
 function updateTotal(argument){ // atualiza total usando acoes
 
     var acao = argument;
+    var precoTotalfinal;
     var precoTotalcart = document.getElementsByClassName('preco-total-cart');
     var precoSubtotalcart = localStorage.getItem('precoSubtotalcart');
 
@@ -250,15 +255,17 @@ function updateTotal(argument){ // atualiza total usando acoes
     if(acao == "addCupom"){
         var valorCupom = parseInt(precoSubtotalcart)* 0.25;
         localStorage.setItem('valorCupom', valorCupom);
-        precoTotalcart[0].innerHTML = parseInt(precoSubtotalcart) - valorCupom;
+        precoTotalfinal = parseInt(precoSubtotalcart) - valorCupom;
         mensagemCupom[0].innerHTML = "Desconto de R$ " + valorCupom;
     }
     if(acao == "removeCupom"){
-        precoTotalcart[0].innerHTML = precoSubtotalcart;
+        precoTotalfinal = precoSubtotalcart;
         mensagemCupom[0].innerHTML = "";
     }
     if(acao == "update") {
-        precoTotalcart[0].innerHTML = precoSubtotalcart;
-        localStorage.setItem('precoTotalcart', precoSubtotalcart);
+        precoTotalfinal = precoSubtotalcart;
+        localStorage.setItem('precoTotalcart', precoTotalfinal);
     }
+    precoTotalcart[0].innerHTML = precoTotalfinal;
+    document.cookie = 'precoTotalcart=' + precoTotalfinal + '; path=/';
 }
