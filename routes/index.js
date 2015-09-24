@@ -93,7 +93,7 @@ router.get('/', function(req, res, next) {
 
      } // fim do if
         else{
-          res.render('error', { title: 'VTEX', message: 'Empresa inexistente ou repositórios vazios'});
+          res.render('error', { title: 'VTEX', message: 'Empresa inexistente ou repositorios vazios'});
         }
     when.all(promises_usuarios).then(function () {
 
