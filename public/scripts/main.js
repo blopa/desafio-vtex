@@ -45,6 +45,16 @@ function updateUserscarrinho(user){
     localStorage.setItem('qntCarrinho', qntCarrinho);
 }
 
+function getJsondata(user){
+    var xmlReq = new XMLHttpRequest();
+    xmlReq.open('GET', '/user/?user=' + user, false);
+    xmlReq.send(null);
+    if (xmlReq.status == 200) {
+        var jsonData = JSON.parse(xmlReq.responseText);
+        return jsonData.preco;
+    }
+}
+
 function addField (argument, pagereload) {
     var user = argument; // nome do usuario do github
 
@@ -61,18 +71,21 @@ function addField (argument, pagereload) {
     }
 
     // pegando preço da hora do usuario
-    var precoHora = document.getElementsByClassName('preco-hora-' + user);
+    //var precoHoratemp = document.getElementsByClassName('preco-hora-' + user);
+    //var precoHora = precoHoratemp[0].innerText;
+    var precoHora = getJsondata(user);
 
     // determinando preço total pro carrinho, horas selecionadas * preço por hora
-    var precoTotaluser = parseInt(totalHoras) * parseInt(precoHora[0].innerText);
+    var precoTotaluser = parseInt(totalHoras) * parseInt(precoHora);
 
     var check = document.getElementsByClassName("crt-remover-" + user).length;
     if(check == 0) { // verificando se ja existe o dev no carrinho
         var userAvatar = document.getElementsByClassName('avatar-' + user);
         //var removerUser = 'remover-' + user;
         //var userName = user;
-        if(!pagereload)
+        if(!pagereload) {
             updateUserscarrinho(user);
+        }
 
         var myTable = document.getElementById("carrinho");
         var currentIndex = myTable.rows.length;
@@ -89,7 +102,7 @@ function addField (argument, pagereload) {
 
         var rowPrecohora = document.createElement("p");
         rowPrecohora.setAttribute("class", "moeda preco-hora crt-preco-hora-" + user);
-        rowPrecohora.innerHTML = precoHora[0].innerText;
+        rowPrecohora.innerHTML = precoHora;
 
         var rowTotalhoras = document.createElement("p");
         rowTotalhoras.setAttribute("class", "total-horas crt-total-horas-" + user);
@@ -145,7 +158,14 @@ function addField (argument, pagereload) {
     }
     // atualizando subtotal do pedido
     var tempSubtotal = document.getElementsByClassName('preco-subtotal-cart');
-    var cartAtualizado = parseInt(tempSubtotal[0].innerHTML) + precoTotaluser;
+    var cartAtualizado;
+    if(localStorage.getItem('precoSubtotalcart')){ // se ainda nao houve subtotal setado, set o subtotal a ser igual o total adicionado
+        cartAtualizado = parseInt(localStorage.getItem('precoSubtotalcart')) + precoTotaluser;
+    }
+    else{
+        cartAtualizado = precoTotaluser;
+    }
+    //var cartAtualizado = parseInt(tempSubtotal[0].innerHTML) + precoTotaluser;
     tempSubtotal[0].innerHTML = cartAtualizado;
     localStorage.setItem('precoSubtotalcart', cartAtualizado);
     updateTotal("update"); // atualiza total do pedido
