@@ -1,5 +1,3 @@
-
-
 function addField (argument) {
     var user = argument.name; // nome do usuario do github
 

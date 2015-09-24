@@ -32,7 +32,7 @@ app.use(expressSession({
   secret: 'A9B53En8R1ZJ6mZ5jK3i0h29gVee',
   resave: true,
   saveUninitialized: true,
-  cookie: { secure: true, maxAge: 60000 }
+  cookie: { }
 }));
 
 app.use(bodyParser()); // body-parse

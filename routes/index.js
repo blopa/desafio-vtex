@@ -11,29 +11,18 @@ var request_options = {
   }
 };
 
-var session;
-var org;
-
-function checkSession(argument){
-  var sess = argument;
-  if(sess.org){
-    return null;
-  }
-  else{
-    return sess.org;
-  }
-}
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  var session;
+  var org;
   session = req.session;
-  var sessionChecked = checkSession(session);
-  if(sessionChecked){
-    org = sessionChecked;
-  }
-  else{
-    org = req.query.org || 'AmazingWorks';
+
+  org = session.org || req.query.org || 'AmazingWorks';
+
+  if(org != session.org){
     session.org = org;
   }
+
   //console.log(req.query, org);
   // todos os membros de uma organização
   request.get(
@@ -75,8 +64,7 @@ router.get('/', function(req, res, next) {
                                 usuario.preco += contribuicao.contributions;
                               }
                             });
-                            //res.cookie('nome', 'valor', { maxAge: 900000, httpOnly: true });
-                            //console.log(req.cookie);
+                            res.cookie('nome', 'valor', { maxAge: 900000, httpOnly: true });
                           }
                           sinalizador_repositorios.resolve();
                         });
@@ -98,6 +86,8 @@ router.get('/', function(req, res, next) {
         }
     when.all(promises_usuarios).then(function () {
       console.log(session);
+      console.log(res.cookie);
+
       res.render('index', { title: 'VTEX', usuarios:usuarios });
     });
 
