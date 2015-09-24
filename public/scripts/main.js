@@ -1,32 +1,83 @@
-function addField (argument) {
-    var user = argument.name; // nome do usuario do github
+window.onload = function() {
+    atualizaDadospg();
+};
 
+function atualizaDadospg(){
+    var usersCarrinho = JSON.parse(localStorage.getItem("usersCarrinho"));
+    var valorCupom = localStorage.getItem("valorCupom");
+    if(usersCarrinho) {
+        usersCarrinho.forEach(function(usuario){
+            //var cartPrecohorauser = localStorage.getItem("cartPrecohorauser-" + usuario);
+            //var cartTotalhoras = localStorage.getItem("cartTotalhoras-" + usuario);
+            //var cartTotalhoras = localStorage.getItem("cartPrecototaluser-" + usuario);
+            addField(usuario);
+        });
+    }
+    if(valorCupom){
+        var campoCupom = document.getElementsByClassName('cupom');
+        campoCupom[0].value = "SHIPIT";
+        addDesconto();
+    }
+}
+
+function addTocart(button){
+    var user = button.dataset.user;
+    addField(user);
+}
+
+function updateUserscarrinho(user){
+    if(!localStorage.getItem("qntCarrinho")) {
+        localStorage.setItem('qntCarrinho', 0);
+    }
+    if(!localStorage.getItem("usersCarrinho")) {
+        var usersCarrinho = new Array();
+    }
+    else{
+        var usersCarrinho = JSON.parse(localStorage.getItem("usersCarrinho"));
+    }
+
+    var qntCarrinho = parseInt(localStorage.getItem('qntCarrinho'));
+
+    usersCarrinho[qntCarrinho] = user;
+    localStorage.setItem('usersCarrinho', JSON.stringify(usersCarrinho));
+
+    qntCarrinho++;
+    localStorage.setItem('qntCarrinho', qntCarrinho);
+}
+
+function addField (argument) {
+    var user = argument; // nome do usuario do github
+
+    var totalHoras;
     // verifica se o input das horas esta vazio, se tiver seta pra 0
-    var totalHoras = document.getElementsByClassName('total-horas-' + user);
-    if(totalHoras[0].value == ''){
-        totalHoras[0].value = 0;
+    var totalHorastemp = document.getElementsByClassName('total-horas-' + user);
+    if(totalHorastemp[0].value == ''){
+        totalHoras = 0;
+    }
+    else{
+        totalHoras = totalHorastemp[0].value;
+    }
+    if(localStorage.getItem("cartTotalhoras-" + user)) {
+        totalHoras = localStorage.getItem("cartTotalhoras-" + user);
     }
 
     // pegando preço da hora do usuario
     var precoHora = document.getElementsByClassName('preco-hora-' + user);
 
     // determinando preço total pro carrinho, horas selecionadas * preço por hora
-    var precoTotaluser = parseInt(totalHoras[0].value) * parseInt(precoHora[0].innerText);
+    var precoTotaluser = parseInt(totalHoras) * parseInt(precoHora[0].innerText);
 
     var check = document.getElementsByClassName("crt-remover-" + user).length;
     if(check == 0) { // verificando se ja existe o dev no carrinho
-        var myTable = document.getElementById("carrinho");
         var userAvatar = document.getElementsByClassName('avatar-' + user);
         //var removerUser = 'remover-' + user;
         //var userName = user;
+        if(!localStorage.getItem("cartTotalhoras-" + user))
+            updateUserscarrinho(user);
+
+        var myTable = document.getElementById("carrinho");
         var currentIndex = myTable.rows.length;
         var currentRow = myTable.insertRow(-1);
-
-        if(document.cookie.indexOf("qntCarrinho") < 0) {
-            createCookie('qntCarrinho', 0, 1);
-        }
-        var qntCarrinho = parseInt(readCookie('qntCarrinho')) + 1;
-        createCookie('qntCarrinho', qntCarrinho, 1);
 
         // adicionando nova row pra tabela do carrinho com todos elementos necessarios
         var rowUseravatar = document.createElement("img");
@@ -43,18 +94,19 @@ function addField (argument) {
 
         var rowTotalhoras = document.createElement("p");
         rowTotalhoras.setAttribute("class", "total-horas crt-total-horas-" + user);
-        rowTotalhoras.innerHTML = totalHoras[0].value;
+        rowTotalhoras.innerHTML = totalHoras;
         //createCookie('totalHoras-' + user, totalHoras[0].value, 1);
-        createCookie('cartTotalhoras-' + user, totalHoras[0].value, 1);
+        localStorage.setItem('cartTotalhoras-' + user, totalHoras);
 
         var rowprecoTotaluser = document.createElement("p");
         rowprecoTotaluser.setAttribute("class", "moeda preco-total-user crt-preco-total-" + user);
         rowprecoTotaluser.innerHTML = precoTotaluser;
         //createCookie('precoTotaluser-' + user, precoTotaluser, 1);
-        createCookie('cartPrecototaluser-' + user, precoTotaluser, 1);
+        localStorage.setItem('cartPrecototaluser-' + user, precoTotaluser);
 
         var rowRemoveuser = document.createElement("input");
-        rowRemoveuser.setAttribute("name", user);
+        rowRemoveuser.setAttribute("data-user", user);
+        rowRemoveuser.setAttribute("id", "crt-btn-remove-" + user);
         rowRemoveuser.setAttribute("type", "button");
         rowRemoveuser.setAttribute("value", "Remover");
         rowRemoveuser.setAttribute("onclick", "removeFromcart(this);");
@@ -81,39 +133,45 @@ function addField (argument) {
     else{ // caso dev ja esteja no carrinho, apenas adiciona as horas
         var atualizaTotalhoras = document.getElementsByClassName('crt-total-horas-' + user);
         //var totalHorascookie = readCookie('totalHoras-' + user);
-        var cartTotalhorascookie = readCookie('cartTotalhoras-' + user);
-        var atualizaDadostotalhoras = parseInt(totalHoras[0].value) + parseInt(cartTotalhorascookie);
+        var cartTotalhorasstorage = localStorage.getItem('cartTotalhoras-' + user);
+        var atualizaDadostotalhoras = parseInt(totalHoras) + parseInt(cartTotalhorasstorage);
         atualizaTotalhoras[0].innerHTML = atualizaDadostotalhoras;
-        createCookie('cartTotalhoras-' + user, atualizaDadostotalhoras, 1);
+        localStorage.setItem('cartTotalhoras-' + user, atualizaDadostotalhoras);
 
         var atualizaPrecototaluser = document.getElementsByClassName('crt-preco-total-' + user);
-        var atualizaPrecototalusercookies = readCookie('cartPrecototaluser-' + user);
-        var atualizaDadosprecototal = parseInt(atualizaPrecototalusercookies) + precoTotaluser;
+        var atualizaPrecototaluserstorage = localStorage.getItem('cartPrecototaluser-' + user);
+        var atualizaDadosprecototal = parseInt(atualizaPrecototaluserstorage) + precoTotaluser;
         atualizaPrecototaluser[0].innerHTML = atualizaDadosprecototal;
-        createCookie('cartPrecototaluser-' + user, atualizaDadosprecototal, 1);
+        localStorage.setItem('cartPrecototaluser-' + user, atualizaDadosprecototal);
     }
     // atualizando subtotal do pedido
     var tempSubtotal = document.getElementsByClassName('preco-subtotal-cart');
     var cartAtualizado = parseInt(tempSubtotal[0].innerHTML) + precoTotaluser;
     tempSubtotal[0].innerHTML = cartAtualizado;
-    createCookie('precoSubtotalcart', cartAtualizado, 1);
+    localStorage.setItem('precoSubtotalcart', cartAtualizado);
     updateTotal("update"); // atualiza total do pedido
 }
 
 function removeFromcart (argument) {
-    var user = argument.name;
+    var user = argument.dataset.user;
 
     var precoSubtotalcart = document.getElementsByClassName('preco-subtotal-cart');
-    var precoSubtotalcartcookie = readCookie('precoSubtotalcart');
+    var precoSubtotalcartstorage = localStorage.getItem('precoSubtotalcart');
     //var removePrecototaluser = document.getElementsByClassName('crt-preco-total-' + user);
-    var removePrecototaluser = readCookie('cartPrecototaluser-' + user);
-    var atualizaPrecosubtotal = parseInt(precoSubtotalcartcookie) - parseInt(removePrecototaluser);
+    var removePrecototaluser = localStorage.getItem('cartPrecototaluser-' + user);
+    var atualizaPrecosubtotal = parseInt(precoSubtotalcartstorage) - parseInt(removePrecototaluser);
     precoSubtotalcart[0].innerHTML = atualizaPrecosubtotal;
-    createCookie('precoSubtotalcart', atualizaPrecosubtotal, 1);
-    createCookie('cartPrecototaluser-' + user, 0, 1);
-    var qntCarrinho = parseInt(readCookie('qntCarrinho')) - 1;
-    createCookie('qntCarrinho', qntCarrinho, 1);
-    eraseCookie('cartTotalhoras-' + user);
+    localStorage.setItem('precoSubtotalcart', atualizaPrecosubtotal);
+    localStorage.setItem('cartPrecototaluser-' + user, 0);
+
+    var usersCarrinho = JSON.parse(localStorage.getItem("usersCarrinho"));
+    var userIndex = usersCarrinho.indexOf(user);
+    usersCarrinho.splice(userIndex, 1);
+    localStorage.setItem('usersCarrinho', JSON.stringify(usersCarrinho));
+
+    var qntCarrinho = parseInt(localStorage.getItem('qntCarrinho')) - 1;
+    localStorage.setItem('qntCarrinho', qntCarrinho);
+    localStorage.removeItem('cartTotalhoras-' + user);
 
     // remove dev do carrinho
     var row = argument.parentNode.parentNode;
@@ -145,6 +203,7 @@ function removeDesconto (argument){ // remove desconto do total do pedido
     tipoRequest[0].innerHTML = "Inserir";
     cupom[0].disabled = false;
     cupom[0].value = "";
+    localStorage.removeItem('valorCupom');
     updateTotal('removeCupom');
 }
 
@@ -152,13 +211,13 @@ function updateTotal(argument){ // atualiza total usando acoes
 
     var acao = argument;
     var precoTotalcart = document.getElementsByClassName('preco-total-cart');
-    var precoSubtotalcart = readCookie('precoSubtotalcart');
+    var precoSubtotalcart = localStorage.getItem('precoSubtotalcart');
 
     var mensagemCupom = document.getElementsByClassName('mensagem-cupom');
 
     if(acao == "addCupom"){
         var valorCupom = parseInt(precoSubtotalcart)* 0.25;
-        createCookie('valorCupom', valorCupom, 1);
+        localStorage.setItem('valorCupom', valorCupom);
         precoTotalcart[0].innerHTML = parseInt(precoSubtotalcart) - valorCupom;
         mensagemCupom[0].innerHTML = "Desconto de R$ " + valorCupom;
     }
@@ -168,36 +227,6 @@ function updateTotal(argument){ // atualiza total usando acoes
     }
     if(acao == "update") {
         precoTotalcart[0].innerHTML = precoSubtotalcart;
-        createCookie('precoTotalcart', precoSubtotalcart, 1);
+        localStorage.setItem('precoTotalcart', precoSubtotalcart);
     }
-    console.log(document.cookie);
-}
-
-// cookies
-
-function createCookie(name, value, days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        expires = "; expires="+date.toGMTString();
-    }
-    document.cookie = name + "=" + value + expires + "; path=/";
-}
-
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var cookie = document.cookie.split(';');
-    for(var i = 0; i < cookie.length; i++) {
-        var c = cookie[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0){
-            return c.substring(nameEQ.length,c.length);
-        }
-    }
-    return null;
-}
-
-function eraseCookie(name) {
-    createCookie(name, "", -1);
 }
