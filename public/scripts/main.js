@@ -169,7 +169,12 @@ function addField (argument, pagereload) {
         cartAtualizado = parseInt(localStorage.getItem('precoSubtotalcart')) + precoTotaluser;
     }
     else{
-        cartAtualizado = precoTotaluser;
+        if(!pagereload){
+            cartAtualizado = precoTotaluser;
+        }
+        else{
+            cartAtualizado = localStorage.getItem('precoSubtotalcart');
+        }
     }
     //var cartAtualizado = parseInt(tempSubtotal[0].innerHTML) + precoTotaluser;
     tempSubtotal[0].innerHTML = cartAtualizado;
