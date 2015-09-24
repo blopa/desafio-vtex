@@ -10,7 +10,7 @@ function atualizaDadospg(){
             //var cartPrecohorauser = localStorage.getItem("cartPrecohorauser-" + usuario);
             //var cartTotalhoras = localStorage.getItem("cartTotalhoras-" + usuario);
             //var cartTotalhoras = localStorage.getItem("cartPrecototaluser-" + usuario);
-            addField(usuario);
+            addField(usuario, 'true');
         });
     }
     if(valorCupom){
@@ -45,19 +45,18 @@ function updateUserscarrinho(user){
     localStorage.setItem('qntCarrinho', qntCarrinho);
 }
 
-function addField (argument) {
+function addField (argument, pagereload) {
     var user = argument; // nome do usuario do github
 
     var totalHoras;
-    // verifica se o input das horas esta vazio, se tiver seta pra 0
     var totalHorastemp = document.getElementsByClassName('total-horas-' + user);
-    if(totalHorastemp[0].value == ''){
+    if(totalHorastemp[0].value == ''){ // verifica se o input das horas esta vazio, se tiver seta pra 0
         totalHoras = 0;
     }
     else{
         totalHoras = totalHorastemp[0].value;
     }
-    if(localStorage.getItem("cartTotalhoras-" + user)) {
+    if(pagereload) {
         totalHoras = localStorage.getItem("cartTotalhoras-" + user);
     }
 
@@ -72,7 +71,7 @@ function addField (argument) {
         var userAvatar = document.getElementsByClassName('avatar-' + user);
         //var removerUser = 'remover-' + user;
         //var userName = user;
-        if(!localStorage.getItem("cartTotalhoras-" + user))
+        if(!pagereload)
             updateUserscarrinho(user);
 
         var myTable = document.getElementById("carrinho");
